@@ -7,6 +7,7 @@ import type {
 
 type Metrics = {
   total: number;
+  escalatedCount: number;
   completeness: number;
   agreement: number;
   escalationRate: number;
@@ -17,6 +18,8 @@ type Metrics = {
 
 type ScenarioResult = {
   annualVolume: number;
+  activeEscalationRate: number;
+  baselineEscalations: number;
   avoidedEscalations: number;
   grossSavings: number;
   hoursReleased: number;
@@ -37,6 +40,7 @@ export function buildEvidenceItems(
       metrics.safetyCriticalRecall,
       metrics.averageHandling,
       metrics.duplicateIds,
+      metrics.escalatedCount,
     ].every(Number.isFinite);
   const allGatesEvaluated =
     gates.length > 0 &&
@@ -54,6 +58,8 @@ export function buildEvidenceItems(
   ].every((value) => Number.isFinite(value) && value > 0);
   const hasScenarioResults = [
     scenarioResult.annualVolume,
+    scenarioResult.activeEscalationRate,
+    scenarioResult.baselineEscalations,
     scenarioResult.avoidedEscalations,
     scenarioResult.grossSavings,
     scenarioResult.hoursReleased,
@@ -62,7 +68,7 @@ export function buildEvidenceItems(
   return [
     {
       id: "dataset",
-      label: "Frozen synthetic dataset",
+      label: "Active validated dataset",
       source: "dataset",
       available: metrics.total > 0,
     },
@@ -177,7 +183,7 @@ export type BriefResult =
       ok: true;
       brief: BriefInput & {
         evidenceCoverage: number;
-        approvalScope: "Synthetic demonstration only";
+        approvalScope: "Demonstration only";
       };
     }
   | {
@@ -200,7 +206,7 @@ export function createDecisionBrief(input: BriefInput): BriefResult {
     brief: {
       ...input,
       evidenceCoverage: input.decisionState.evidenceCoverage,
-      approvalScope: "Synthetic demonstration only",
+      approvalScope: "Demonstration only",
     },
   };
 }

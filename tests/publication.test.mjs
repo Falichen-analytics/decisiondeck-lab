@@ -16,13 +16,14 @@ test("static application shell identifies DecisionDeck Lab", async () => {
   assert.match(html, /src="\/src\/main\.tsx"/i);
 });
 
-test("planned features are explicit and trust labels are state-derived", async () => {
+test("data import is operational, remaining plans are explicit and trust labels are state-derived", async () => {
   const component = await text("src/components/DecisionDeckLab.tsx");
+  const importPanel = await text("src/components/DataImportPanel.tsx");
   const decision = await text("src/core/decision.ts");
 
-  for (const feature of ["CSV import", "XLSX import", "Baseline comparison"]) {
-    assert.match(component, new RegExp(feature, "i"));
-  }
+  assert.match(importPanel, /CSV\/XLSX validation workspace/i);
+  assert.match(importPanel, /Confirm and activate import/i);
+  assert.match(component, /Baseline comparison/i);
   assert.match(component, /Planned · unavailable/);
   assert.match(component, /decisionState\.evidenceCoverage/);
   assert.match(component, /decisionState\.readinessLabel/);

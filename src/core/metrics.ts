@@ -25,6 +25,7 @@ export function calculateMetrics(cases: TriageCase[]) {
 
   return {
     total,
+    escalatedCount: escalated,
     completeness: (complete / Math.max(total, 1)) * 100,
     agreement: (correct / Math.max(total, 1)) * 100,
     escalationRate: (escalated / Math.max(total, 1)) * 100,
@@ -35,15 +36,22 @@ export function calculateMetrics(cases: TriageCase[]) {
   };
 }
 
-export function calculateScenario(inputs: ScenarioInputs) {
+export function calculateScenario(
+  inputs: ScenarioInputs,
+  activeEscalationRate: number,
+) {
   const annualVolume = inputs.monthlyVolume * 12;
+  const baselineEscalations =
+    annualVolume * (activeEscalationRate / 100);
   const avoidedEscalations =
-    annualVolume * (inputs.escalationReduction / 100);
+    baselineEscalations * (inputs.escalationReduction / 100);
   const grossSavings = avoidedEscalations * inputs.escalationCost;
   const hoursReleased = (avoidedEscalations * 22) / 60;
 
   return {
     annualVolume,
+    activeEscalationRate,
+    baselineEscalations: Math.round(baselineEscalations),
     avoidedEscalations: Math.round(avoidedEscalations),
     grossSavings: Math.round(grossSavings),
     hoursReleased: Math.round(hoursReleased),
@@ -70,7 +78,7 @@ export function evaluateQualityGates(
       required: "0",
       passed: metrics.duplicateIds === 0,
       explanation:
-        "Each synthetic triage contact must have one stable identifier.",
+        "Each active triage contact must have one stable identifier.",
     },
     {
       id: "agreement",
@@ -88,7 +96,7 @@ export function evaluateQualityGates(
       required: "≥ 80%",
       passed: metrics.safetyCriticalRecall >= 80,
       explanation:
-        "Safety-critical synthetic cases must retain an A0, A1 or A2 escalation pathway.",
+        "Safety-critical cases must retain an A0, A1 or A2 escalation pathway.",
     },
   ];
 }
