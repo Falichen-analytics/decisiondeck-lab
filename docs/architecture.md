@@ -97,6 +97,6 @@ validated. Activation requires a valid result and a separate user confirmation.
 ## Deployment shape
 
 The production output is a static Vite build containing HTML, CSS and
-JavaScript. Phase 3 will configure and verify the repository subpath required
-for GitHub Pages. The quality workflow remains separate from any future
-deployment workflow.
+JavaScript. Production builds use the `/decisiondeck-lab/` base path, while
+local development uses `/`. The repository contains a separate, manual GitHub
+Pages workflow. Deployment has been prepared but has not yet been performed.
