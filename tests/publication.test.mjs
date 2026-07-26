@@ -2,7 +2,23 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
+import {
+  analyseHeaders,
+  suggestMapping,
+} from "../src/import/mapping.ts";
+import { parseCsvText } from "../src/import/parsers.ts";
+import { validateSheet } from "../src/import/validation.ts";
+
 const root = new URL("../", import.meta.url);
+const requiredHeaders = [
+  "id",
+  "category",
+  "complete",
+  "safetyCritical",
+  "referenceUrgency",
+  "predictedUrgency",
+  "assessmentMinutes",
+];
 
 async function text(path) {
   return readFile(new URL(path, root), "utf8");
@@ -42,4 +58,45 @@ test("the active toolchain contains no removed starter infrastructure", async ()
     /vinext|wrangler|cloudflare|tailwind|next|react-server-dom/i,
   );
   assert.doesNotMatch(viteConfig, /vinext|wrangler|cloudflare|sites/i);
+});
+
+test("public documentation states the synthetic and independent portfolio boundary", async () => {
+  const readme = await text("README.md");
+  const component = await text("src/components/DecisionDeckLab.tsx");
+  const normalisedReadme = readme
+    .replace(/^>\s?/gm, "")
+    .replace(/\s+/g, " ");
+
+  assert.match(
+    normalisedReadme,
+    /independent portfolio demonstration using fictional and synthetic healthcare triage data/i,
+  );
+  assert.match(
+    normalisedReadme,
+    /not affiliated with, endorsed by or representative of any healthcare organisation or clinical programme/i,
+  );
+  assert.match(readme, /not a medical device/i);
+  assert.match(readme, /not forecasts/i);
+  assert.doesNotMatch(component, /same\s+frozen dataset/i);
+  assert.match(component, /same\s+active dataset/i);
+});
+
+test("the public sample uses the exact schema and passes the real import validator", async () => {
+  const csv = await text("examples/sample-triage-cases.csv");
+  const parsed = parseCsvText(csv);
+  const headers = analyseHeaders(parsed.rows[0]).headers;
+  const validation = validateSheet(
+    { name: "CSV", rows: parsed.rows, formulaCells: [] },
+    suggestMapping(headers),
+    "csv-import",
+  );
+
+  assert.deepEqual(headers, requiredHeaders);
+  assert.equal(validation.valid, true);
+  assert.equal(validation.rowCount, 32);
+  assert.equal(new Set(validation.cases.map((item) => item.id)).size, 32);
+  assert.doesNotMatch(
+    csv,
+    /(^|[^A-Za-z])(ARR|VRR)([^A-Za-z]|$)|\/Users\/|@/i,
+  );
 });
