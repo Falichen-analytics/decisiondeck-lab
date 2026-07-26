@@ -84,7 +84,7 @@ test("all verified screenshots and the social preview have their required dimens
   }
 });
 
-test("README media references are real files and no fake live URL is published", async () => {
+test("README media references are real files and the verified live demo is published", async () => {
   const readme = await text("README.md");
   const imageLinks = [...readme.matchAll(/\]\((docs\/assets\/screenshots\/[^)]+)\)/g)]
     .map((match) => match[1]);
@@ -94,9 +94,17 @@ test("README media references are real files and no fake live URL is published",
     await access(new URL(path, root));
   }
 
+  const liveDemoLine = readme.match(/^\*\*Live demo:\*\*.*$/m)?.[0];
+  assert.equal(
+    liveDemoLine,
+    "**Live demo:** [Open DecisionDeck Lab](https://falichen-analytics.github.io/decisiondeck-lab/)",
+  );
   assert.doesNotMatch(
     readme,
-    /https:\/\/falichen-analytics\.github\.io\/decisiondeck-lab\//,
+    /https?:\/\/(?:localhost|127\.0\.0\.1|example\.com)(?:[/:]|$)|\]\((?:#|[^)]*placeholder[^)]*)\)/i,
   );
-  assert.match(readme, /No public deployment is available yet/i);
+  assert.doesNotMatch(
+    readme,
+    /No public deployment is available yet|deployment is prepared but has not been published/i,
+  );
 });

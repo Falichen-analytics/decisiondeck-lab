@@ -11,8 +11,7 @@ built around a fictional healthcare triage case. It connects local CSV/XLSX
 import, data-quality controls, deterministic KPIs, scenario modelling,
 evidence-linked recommendations and management communication in one workflow.
 
-**Live demo:** GitHub Pages deployment is prepared but has not been published.
-No public deployment is available yet.
+**Live demo:** [Open DecisionDeck Lab](https://falichen-analytics.github.io/decisiondeck-lab/)
 
 [![DecisionDeck Lab desktop interface showing the synthetic healthcare
 analytics workflow](docs/assets/screenshots/01-desktop-hero.png)](docs/assets/screenshots/01-desktop-hero.png)
