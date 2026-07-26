@@ -11,8 +11,11 @@ built around a fictional healthcare triage case. It connects local CSV/XLSX
 import, data-quality controls, deterministic KPIs, scenario modelling,
 evidence-linked recommendations and management communication in one workflow.
 
-**Live demo:** planned for Phase 3 using GitHub Pages. No public deployment is
-available yet.
+**Live demo:** GitHub Pages deployment is prepared but has not been published.
+No public deployment is available yet.
+
+[![DecisionDeck Lab desktop interface showing the synthetic healthcare
+analytics workflow](docs/assets/screenshots/01-desktop-hero.png)](docs/assets/screenshots/01-desktop-hero.png)
 
 ## Independent portfolio demonstration
 
@@ -213,10 +216,22 @@ governance or clinical-safety control.
 
 ## Media
 
-Verified screenshots and a short workflow demonstration will be added during
-Phase 3 using only the running application and synthetic data. The capture plan
-is documented in [Media plan](docs/media-plan.md). No placeholder image or fake
-demo URL is used.
+Every image below was captured from the production build using synthetic data.
+No interface state or KPI was fabricated.
+
+| Local import | Quality controls | Decision story |
+| --- | --- | --- |
+| [![CSV preview using the public synthetic sample](docs/assets/screenshots/02-import-preview.png)](docs/assets/screenshots/02-import-preview.png) | [![Four calculated data-quality gates passing](docs/assets/screenshots/05-passing-gates.png)](docs/assets/screenshots/05-passing-gates.png) | [![Evidence-linked executive decision story](docs/assets/screenshots/08-evidence-story.png)](docs/assets/screenshots/08-evidence-story.png) |
+
+See the verified [column mapping](docs/assets/screenshots/03-column-mapping.png),
+[row-level errors](docs/assets/screenshots/04-validation-errors.png),
+[blocked decision](docs/assets/screenshots/06-blocked-decision.png),
+[scenario lab](docs/assets/screenshots/07-scenario-lab.png) and
+[mobile view](docs/assets/screenshots/09-mobile-view.png). The full capture and
+privacy checks are documented in the [media plan](docs/media-plan.md).
+
+A video is intentionally deferred: reliable, privacy-safe recording tooling was
+not available during this phase. No placeholder video or fake demo URL is used.
 
 ## Limitations
 
@@ -235,8 +250,8 @@ demo URL is used.
 
 ## Roadmap
 
-- verified screenshots and short demonstration;
-- GitHub Pages static deployment;
+- GitHub Pages static deployment after final release approval;
+- optional privacy-reviewed short demonstration;
 - automated accessibility and link checks;
 - baseline comparison;
 - automatic data profiling and a central KPI dictionary;
