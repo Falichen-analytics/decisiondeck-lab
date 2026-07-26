@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">DecisionDeck Lab</title>
+  <rect width="64" height="64" rx="10" fill="#18a89f"/>
+  <path fill="#071824" d="M14 18h15c12 0 20 5 20 14s-8 14-20 14H14V18Zm14 20c7 0 10-2 10-6s-3-6-10-6h-3v12h3Z"/>
+</svg>
