@@ -532,7 +532,7 @@ export function DecisionDeckLab() {
                   <p>
                     Final presentation and export are blocked when required
                     quality gates fail. The same rules are applied to the same
-                    frozen dataset so results remain reproducible.
+                    active dataset so results remain reproducible.
                   </p>
                 </div>
                 {decisionState.failedGates.length > 0 && (

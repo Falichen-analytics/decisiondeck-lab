@@ -1,0 +1,33 @@
+id,category,complete,safetyCritical,referenceUrgency,predictedUrgency,assessmentMinutes
+DEMO-001,Chest pain,true,true,A0,A0,8
+DEMO-002,Breathing difficulty,true,true,A1,A1,10
+DEMO-003,Neurological,true,true,A1,A1,12
+DEMO-004,Other acute,true,false,A2,A2,14
+DEMO-005,Chest pain,true,false,C1,C1,16
+DEMO-006,Breathing difficulty,true,false,C2,C2,18
+DEMO-007,Neurological,true,false,A2,A2,20
+DEMO-008,Other acute,true,false,C1,C1,22
+DEMO-009,Chest pain,true,true,A1,A1,9
+DEMO-010,Breathing difficulty,true,true,A0,A0,11
+DEMO-011,Neurological,true,true,A1,A1,13
+DEMO-012,Other acute,true,false,C2,C2,15
+DEMO-013,Chest pain,true,false,A2,A2,17
+DEMO-014,Breathing difficulty,true,false,C1,C1,19
+DEMO-015,Neurological,true,false,C2,C2,21
+DEMO-016,Other acute,true,false,A2,A2,23
+DEMO-017,Chest pain,false,false,C1,C1,12
+DEMO-018,Breathing difficulty,true,true,A1,A1,14
+DEMO-019,Neurological,true,true,A0,A0,16
+DEMO-020,Other acute,true,false,C2,C2,18
+DEMO-021,Chest pain,true,true,A1,A1,20
+DEMO-022,Breathing difficulty,true,false,A2,A2,22
+DEMO-023,Neurological,true,false,C1,C1,24
+DEMO-024,Other acute,true,false,C2,C2,26
+DEMO-025,Chest pain,true,true,A0,A0,11
+DEMO-026,Breathing difficulty,true,false,C1,C1,13
+DEMO-027,Neurological,true,true,A1,A1,15
+DEMO-028,Other acute,true,false,C1,C2,17
+DEMO-029,Chest pain,true,false,C2,C2,19
+DEMO-030,Breathing difficulty,true,true,A1,A1,21
+DEMO-031,Neurological,true,false,A2,A2,23
+DEMO-032,Other acute,true,false,C1,C1,25
