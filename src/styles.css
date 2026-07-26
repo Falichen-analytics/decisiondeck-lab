@@ -51,14 +51,11 @@ a {
 
 button:focus-visible,
 a:focus-visible,
-input:focus-visible {
-  outline: 3px solid var(--gold-500);
-  outline-offset: 3px;
-}
-
+input:focus-visible,
 select:focus-visible {
-  outline: 3px solid var(--gold-500);
+  outline: 3px solid var(--navy-950);
   outline-offset: 3px;
+  box-shadow: 0 0 0 3px var(--gold-500);
 }
 
 .hero {
@@ -637,8 +634,9 @@ footer {
 }
 
 .file-picker:focus-within {
-  outline: 3px solid var(--gold-500);
+  outline: 3px solid var(--navy-950);
   outline-offset: 3px;
+  box-shadow: 0 0 0 3px var(--gold-500);
 }
 
 .import-actions {
