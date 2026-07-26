@@ -23,7 +23,7 @@ const scenario = {
   escalationCost: 92,
 };
 const metrics = calculateMetrics(syntheticCases);
-const scenarioResult = calculateScenario(scenario);
+const scenarioResult = calculateScenario(scenario, metrics.escalationRate);
 const passingGates = evaluateQualityGates(metrics);
 
 function briefInput(gates, decisionState, evidenceItems) {

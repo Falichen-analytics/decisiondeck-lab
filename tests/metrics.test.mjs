@@ -14,6 +14,7 @@ test("calculates the frozen synthetic baseline reproducibly", () => {
 
   assert.deepEqual(first, second);
   assert.equal(first.total, 48);
+  assert.equal(first.escalatedCount, 16);
   assert.equal(first.duplicateIds, 0);
   assert.equal(first.completeness, 95.83333333333334);
   assert.equal(first.agreement, 93.75);
@@ -23,16 +24,21 @@ test("calculates the frozen synthetic baseline reproducibly", () => {
 
 test("keeps scenario calculations transparent and deterministic", () => {
   assert.deepEqual(
-    calculateScenario({
-      monthlyVolume: 2400,
-      escalationReduction: 6,
-      escalationCost: 92,
-    }),
+    calculateScenario(
+      {
+        monthlyVolume: 2400,
+        escalationReduction: 6,
+        escalationCost: 92,
+      },
+      33.33333333333333,
+    ),
     {
       annualVolume: 28800,
-      avoidedEscalations: 1728,
-      grossSavings: 158976,
-      hoursReleased: 634,
+      activeEscalationRate: 33.33333333333333,
+      baselineEscalations: 9600,
+      avoidedEscalations: 576,
+      grossSavings: 52992,
+      hoursReleased: 211,
     },
   );
 });

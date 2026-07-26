@@ -10,10 +10,12 @@ import {
   evaluateQualityGates,
 } from "../core/metrics";
 import type { ScenarioInputs } from "../core/types";
+import { DataImportPanel } from "./DataImportPanel";
 import {
-  datasetMetadata,
-  syntheticCases,
-} from "../data/syntheticCases";
+  createDemoActiveDataset,
+} from "../import/activation";
+import { IMPORT_LIMITS } from "../import/config";
+import type { ActiveDataset } from "../import/types";
 
 type TabId = "overview" | "quality" | "scenarios" | "story";
 
@@ -62,12 +64,18 @@ export function DecisionDeckLab() {
     escalationReduction: 6,
     escalationCost: 92,
   });
+  const [activeDataset, setActiveDataset] = useState<ActiveDataset>(
+    createDemoActiveDataset,
+  );
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const metrics = useMemo(() => calculateMetrics(syntheticCases), []);
+  const metrics = useMemo(
+    () => calculateMetrics(activeDataset.cases),
+    [activeDataset],
+  );
   const gates = useMemo(() => evaluateQualityGates(metrics), [metrics]);
   const scenarioResult = useMemo(
-    () => calculateScenario(scenario),
-    [scenario],
+    () => calculateScenario(scenario, metrics.escalationRate),
+    [metrics.escalationRate, scenario],
   );
   const evidenceItems = useMemo(
     () => buildEvidenceItems(metrics, gates, scenario, scenarioResult),
@@ -106,8 +114,8 @@ export function DecisionDeckLab() {
   const downloadBrief = () => {
     const result = createDecisionBrief({
       product: "DecisionDeck Lab",
-      demonstration: "Synthetic Triage+ healthcare case",
-      dataset: datasetMetadata,
+      demonstration: "Triage+ healthcare analytics demonstration",
+      dataset: activeDataset.provenance,
       metrics,
       qualityGates: gates,
       evidenceItems,
@@ -117,8 +125,11 @@ export function DecisionDeckLab() {
         "Pilot decision support for repeatable lower-urgency triage contacts while preserving A0, A1 and A2 escalation controls.",
       limitations: [
         "No live AI is used.",
-        "No real patient, clinical or operational data is included.",
+        activeDataset.provenance.sourceType === "synthetic-demo"
+          ? "The built-in demonstration contains no real patient, clinical or operational data."
+          : "Imported rows were selected locally by the user, remain in browser memory only and are not included in this evidence export.",
         "Urgency assignments and scenario values are illustrative and require clinical and operational validation.",
+        "Spreadsheet formula injection must be addressed before any future CSV or XLSX export capability is introduced.",
       ],
     });
 
@@ -164,7 +175,6 @@ export function DecisionDeckLab() {
             <button
               type="button"
               onClick={downloadBrief}
-              aria-disabled={!decisionState.canExport}
               aria-describedby="export-state"
             >
               Export brief
@@ -203,7 +213,11 @@ export function DecisionDeckLab() {
               </button>
             </div>
             <div className="trust-strip" aria-label="Demonstration boundaries">
-              <span>Synthetic data</span>
+              <span>
+                {activeDataset.provenance.sourceType === "synthetic-demo"
+                  ? "Synthetic demo data"
+                  : "Local user-selected data"}
+              </span>
               <span>Deterministic calculations</span>
               <span>Not for clinical use</span>
               <span>No live AI</span>
@@ -227,7 +241,7 @@ export function DecisionDeckLab() {
                 {decisionState.readinessLabel}
               </span>
             </div>
-            <h2>Triage+ Synthetic Case Study</h2>
+            <h2>Triage+ Healthcare Case Study</h2>
             <p>
               Improve consistency for lower-urgency contacts without weakening
               A0, A1 or A2 safety controls.
@@ -268,8 +282,10 @@ export function DecisionDeckLab() {
               </p>
             </div>
             <div className="brief-footer">
-              <EvidenceTag>Dataset {datasetMetadata.version}</EvidenceTag>
-              <EvidenceTag>48 fictional cases</EvidenceTag>
+              <EvidenceTag>{activeDataset.provenance.displayName}</EvidenceTag>
+              <EvidenceTag>
+                {activeDataset.provenance.rowCount} active cases
+              </EvidenceTag>
               <EvidenceTag>{decisionState.exportStatusLabel}</EvidenceTag>
             </div>
           </aside>
@@ -280,7 +296,7 @@ export function DecisionDeckLab() {
         <p>One controlled analytical chain</p>
         <ol>
           {[
-            "Use sample",
+            "Select data",
             "Validate",
             "Measure",
             "Model",
@@ -317,25 +333,42 @@ export function DecisionDeckLab() {
       <section className="workspace" id="workspace">
         <div className="section-heading">
           <div>
-            <span className="section-index">WORKSPACE / SYNTHETIC CASE</span>
-            <h2>From synthetic triage evidence to a board-ready recommendation</h2>
+            <span className="section-index">WORKSPACE / ACTIVE EVIDENCE</span>
+            <h2>From triage evidence to a board-ready recommendation</h2>
           </div>
           <p>
-            Every result below is calculated from deterministic fictional
-            triage cases. Nothing represents an actual patient, clinician,
-            healthcare organisation or operational system.
+            Results are calculated deterministically from the active dataset.
+            The built-in cases are fictional; imported files stay in browser
+            memory and are the user&apos;s responsibility. This demonstration
+            is not for clinical use.
           </p>
         </div>
 
+        <DataImportPanel
+          activeDataset={activeDataset}
+          onActivate={(dataset) => {
+            setActiveDataset(dataset);
+            setActionMessage(
+              `${dataset.provenance.displayName} is now active. KPIs, quality gates, scenarios and readiness were recalculated.`,
+            );
+          }}
+          onReset={() => {
+            setActiveDataset(createDemoActiveDataset());
+            setActionMessage(
+              "The original built-in synthetic demonstration dataset has been restored.",
+            );
+          }}
+        />
+
         <div className="planned-strip" aria-label="Planned capabilities">
-          {["CSV import", "XLSX import", "Baseline comparison"].map(
-            (feature) => (
-              <div key={feature}>
-                <strong>{feature}</strong>
-                <span>Planned · unavailable</span>
-              </div>
-            ),
-          )}
+          <div>
+            <strong>Baseline comparison</strong>
+            <span>Planned · unavailable</span>
+          </div>
+          <div>
+            <strong>Imported-data persistence</strong>
+            <span>Not included · browser memory only</span>
+          </div>
         </div>
 
         <div className="tab-shell">
@@ -373,15 +406,21 @@ export function DecisionDeckLab() {
                   <div className="panel-title">
                     <div>
                       <span>Current analytical position</span>
-                      <h3>Synthetic urgency-classification performance</h3>
+                      <h3>Active urgency-classification performance</h3>
                     </div>
-                    <EvidenceTag>{datasetMetadata.version}</EvidenceTag>
+                    <EvidenceTag>
+                      {activeDataset.provenance.displayName}
+                    </EvidenceTag>
                   </div>
                   <div className="metrics-grid">
                     <Metric
-                      label="Synthetic triage cases"
+                      label="Active triage cases"
                       value={String(metrics.total)}
-                      note="Frozen evaluation corpus"
+                      note={
+                        activeDataset.provenance.sourceType === "synthetic-demo"
+                          ? "Built-in fictional evaluation corpus"
+                          : "Validated local import"
+                      }
                     />
                     <Metric
                       label="Overall agreement"
@@ -403,7 +442,7 @@ export function DecisionDeckLab() {
                   <div className="category-section">
                     <div className="subheading">
                       <h4>Symptom-category mix</h4>
-                      <span>Share of 48 cases</span>
+                      <span>Share of {metrics.total} active cases</span>
                     </div>
                     {[
                       "Chest pain",
@@ -412,7 +451,7 @@ export function DecisionDeckLab() {
                       "Other acute",
                     ].map(
                       (category) => {
-                        const count = syntheticCases.filter(
+                        const count = activeDataset.cases.filter(
                           (item) => item.category === category,
                         ).length;
                         return (
@@ -579,12 +618,22 @@ export function DecisionDeckLab() {
                     />
                   </label>
                   <p className="assumption-note">
-                    These values are illustrative assumptions. A real business
-                    case would require validated finance and operations owners.
+                    This is an illustrative projection based on the active
+                    sample and explicit assumptions—not a validated forecast.
+                    A real business case requires validated finance, clinical
+                    and operations owners.
                   </p>
+                  {metrics.total < IMPORT_LIMITS.smallSampleRows && (
+                    <p className="sample-warning" role="note">
+                      Small-sample warning: {metrics.total} cases is below the{" "}
+                      {IMPORT_LIMITS.smallSampleRows}-case interpretation
+                      guide. Treat percentages and projections with extra
+                      caution.
+                    </p>
+                  )}
                 </div>
                 <aside className="scenario-output">
-                  <span>Illustrative annual opportunity</span>
+                  <span>Illustrative projection · not a forecast</span>
                   <strong>{currency.format(scenarioResult.grossSavings)}</strong>
                   <p>
                     from approximately{" "}
@@ -593,9 +642,30 @@ export function DecisionDeckLab() {
                   </p>
                   <div className="scenario-stats">
                     <div>
-                      <span>Annual triage contacts</span>
+                      <span>Active sample</span>
+                      <strong>{metrics.total} cases</strong>
+                    </div>
+                    <div>
+                      <span>Observed sample escalation</span>
+                      <strong>
+                        {metrics.escalatedCount}/{metrics.total} (
+                        {metrics.escalationRate.toFixed(1)}%)
+                      </strong>
+                    </div>
+                    <div>
+                      <span>Annual-volume assumption</span>
                       <strong>
                         {scenarioResult.annualVolume.toLocaleString()}
+                      </strong>
+                    </div>
+                    <div>
+                      <span>Reduction assumption</span>
+                      <strong>{scenario.escalationReduction}%</strong>
+                    </div>
+                    <div>
+                      <span>Illustrative baseline escalations</span>
+                      <strong>
+                        {scenarioResult.baselineEscalations.toLocaleString()}
                       </strong>
                     </div>
                     <div>
@@ -650,7 +720,7 @@ export function DecisionDeckLab() {
                     triage contacts.
                   </h3>
                   <p className="story-intro">
-                    The synthetic evidence supports a bounded pilot, not a
+                    The active evidence supports a bounded pilot, not a
                     clinical deployment. Existing A0, A1 and A2 escalation
                     rules should remain unchanged.
                   </p>
@@ -659,8 +729,8 @@ export function DecisionDeckLab() {
                       <span>WHAT THE DATA SAYS</span>
                       <strong>{metrics.agreement.toFixed(1)}% agreement</strong>
                       <p>
-                        The fictional urgency-classification rules meet the
-                        demonstration agreement threshold on the frozen sample.
+                        The evaluated urgency classifications meet the
+                        demonstration agreement threshold on the active sample.
                       </p>
                     </section>
                     <section>
@@ -709,7 +779,6 @@ export function DecisionDeckLab() {
                     className="button button--primary"
                     type="button"
                     onClick={downloadBrief}
-                    aria-disabled={!decisionState.canExport}
                   >
                     {decisionState.exportStatusLabel}
                   </button>
@@ -765,8 +834,9 @@ export function DecisionDeckLab() {
           </span>
         </div>
         <p>
-          Synthetic healthcare portfolio demonstration · No real patients or
-          clinical records · Not for clinical use · No live AI model
+          Healthcare analytics portfolio demonstration · Built-in data is
+          synthetic · Local imports are not retained · Not for clinical use ·
+          No live AI model
         </p>
         <a href="#top">Back to top ↑</a>
       </footer>
